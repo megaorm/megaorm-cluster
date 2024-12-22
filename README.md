@@ -24,12 +24,12 @@ npm install @megaorm/cluster
 
 To create a `MegaCluster` instance, you can provide one or more `MegaClusterPool` instances during initialization. However, this step is optional since you can always add additional pools at runtime using the `add()` method.
 
-#### MegaClusterPool vs MegaPool
+### MegaClusterPool vs MegaPool
 
 - **`MegaClusterPool`**: Named pools for `MegaCluster`.
 - **`MegaPool`**: Anonymous pools not identified by name.
 
-#### Creating a MegaClusterPool
+### Creating a MegaClusterPool
 
 To create a `MegaClusterPool`, use the following parameters:
 
@@ -50,7 +50,7 @@ const asia = new MegaClusterPool('asia', driver, options);
 const africa = new MegaClusterPool('africa', driver, options);
 ```
 
-#### Creating a MegaCluster
+### Creating a MegaCluster
 
 You can create a `MegaCluster` by passing one or more `MegaClusterPool` instances
 
@@ -64,7 +64,7 @@ Now create a `MegaCluster` instance with the named pools
 const cluster = new MegaCluster(asia, africa);
 ```
 
-#### Adding Pools at Runtime
+### Adding Pools at Runtime
 
 If you don’t want to provide pools initially, you can always add them later using the `add()` method. This allows you to add `MegaClusterPool` instances at runtime, ensuring flexibility in managing your cluster.
 
@@ -74,7 +74,7 @@ cluster.add(new MegaClusterPool('europe', driver, options));
 
 > Make sure the pool name is unique within the cluster. If a pool with the same name already exists, it will throw an error.
 
-#### Removing Pools from the Cluster
+### Removing Pools from the Cluster
 
 The `remove()` method allows you to remove one or more pools from the cluster. Before using this method, ensure the following:
 
@@ -93,7 +93,7 @@ await cluster.remove('asia_*');
 await cluster.remove(/^asia_/);
 ```
 
-#### Freezing Pools
+### Freezing Pools
 
 The `freeze()` method temporarily disables your pool by moving it from the active pool list to the frozen list. While frozen, no new connections can be made to the pool.
 
@@ -121,7 +121,7 @@ cluster.request('asia_1');
 cluster.get.pool('asia_1');
 ```
 
-#### Unfreezing Pools
+### Unfreezing Pools
 
 The `unfreeze()` method moves a pool back from the frozen list to the active list, making it available to handle new connection requests again.
 
@@ -140,7 +140,7 @@ Once unfrozen:
 
 - The pool is active again and can accept new connection requests.
 
-#### Freezing and Removing Pools Safely
+### Freezing and Removing Pools Safely
 
 Before removing a pool, especially if there are queued connection requests, it’s important to **freeze** the pool to stop new requests from coming in. This ensures a smooth removal process without errors.
 
@@ -149,7 +149,7 @@ Before removing a pool, especially if there are queued connection requests, it�
 3. **Wait** for a few seconds.
 4. **Remove** the pool safely.
 
-Here is an example (Not a recommended)
+Here is an example (Not Recommended)
 
 ```js
 // Freeze the pool
@@ -165,7 +165,7 @@ setTimeout(
 
 > You should build an **Admin Dashboard** with buttons for freezing, unfreezing, and removing pools providing an easy and user-friendly way to manage everything.
 
-#### Handling MegaPendingConnections
+### Handling MegaPendingConnections
 
 **MegaPendingConnections** are connections that could not be closed. When this occurs, the pool emits a `CLOSE_FAIL` event, passing the `MegaPendingConnection` instance for you to manage manually.
 
@@ -202,7 +202,7 @@ if (cluster.has.pending()) {
 }
 ```
 
-#### Shutting Down the Cluster
+### Shutting Down the Cluster
 
 To properly shut down the cluster and ensure all resources are cleaned up, you can use the `shutdown()` method. This method performs the following:
 
@@ -233,7 +233,7 @@ cluster
 
 The **`request()`** method allows you to request a connection from an active pool within the cluster. You can optionally specify the pool(s) from which to request the connection. If no pool name is provided, the connection will be requested based on the current mode (either `ORDER_MODE` or `RANDOM_MODE`).
 
-#### Request a Connection from a Specific Pool
+### Request a Connection from a Specific Pool
 
 You can specify the name of the pool from which you want to request a connection. This ensures that the connection comes from the selected pool.
 
@@ -252,7 +252,7 @@ cluster.add(new MegaClusterPool('asia_2', driver));
 const africa1Con = await cluster.request('africa_1');
 ```
 
-#### Request a Connection in Order
+### Request a Connection in Order
 
 If no specific pool name is provided, the connection is requested based on the current mode. By default, the mode is set to `ORDER_MODE`, meaning connections will be provided in the order the pools were added.
 
@@ -267,7 +267,7 @@ cluster.set.mode(ORDER_MODE);
 const con = await cluster.request();
 ```
 
-#### Request a Connection from a Random Pool
+### Request a Connection from a Random Pool
 
 You can change the mode to `RANDOM_MODE` if you want to request a connection from a randomly selected pool.
 
@@ -282,7 +282,7 @@ cluster.set.mode(RANDOM_MODE);
 const randomCon = await cluster.request();
 ```
 
-#### Request a Connection from a Group of Pools in Order
+### Request a Connection from a Group of Pools in Order
 
 You can also request connections from a group of pools using a pattern (e.g., `'africa*'` for all pools starting with `africa`). By default, the connection will be provided in order.
 
@@ -298,7 +298,7 @@ const africanCon = await cluster.request('africa*');
 const asianCon = await cluster.request('asia*');
 ```
 
-#### Request a Random Connection from a Group of Pools
+### Request a Random Connection from a Group of Pools
 
 To request a random connection from a group of pools, you can switch the mode to `RANDOM_MODE`.
 
@@ -314,7 +314,7 @@ const randomAfricanCon = await cluster.request('africa*');
 const randomAsianCon = await cluster.request('asia*');
 ```
 
-#### Use Regular Expressions
+### Use Regular Expressions
 
 You can also use a regular expression to match pool names, which allows for more flexible matching of pools.
 
@@ -324,7 +324,7 @@ const africanCon = await cluster.request(/^africa.+$/);
 const asianCon = await cluster.request(/^asia.+$/);
 ```
 
-#### Notes
+### Notes
 
 - **Active Pools Only**: You can only request connections from active pools.
 - **Mode**: By default, the mode is `ORDER_MODE`. If you want a random connection, you must set the mode to `RANDOM_MODE`.
@@ -337,7 +337,7 @@ This method provides a flexible way to request connections from specific pools o
 
 In addition to warnings, `MegaCluster` can log error messages to a file, These logs can be useful for persistent error tracking, even if the server restarts.
 
-#### How MegaCluster Handles Events
+### How MegaCluster Handles Events
 
 By default, `MegaCluster` listens for the following events and registers corresponding warnings:
 
@@ -354,7 +354,7 @@ By default, `MegaCluster` listens for the following events and registers corresp
 
 For each of these events, `MegaCluster` logs the associated error message to a log file (if you set up a `Logger` instance) and saves `warnings` for you.
 
-#### Using Logger Helper
+### Using Logger Helper
 
 If you'd like to persist these error messages in a log file, you should set up a `Logger` instance. This will allow `MegaCluster` to write the error messages to the specified log file.
 
@@ -371,7 +371,7 @@ cluster.set.logger(logger);
 
 > Once the logger is set, `MegaCluster` will log error messages whenever an issue occurs related to the events mentioned above.
 
-#### Accessing Logs
+### Accessing Logs
 
 You can retrieve all log messages by calling `get.messages()` on the logger instance.
 
@@ -382,7 +382,7 @@ console.log(logs); // Outputs an array of logged messages
 
 > See the full logger API [@megaorm/logger](https://github.com/megaorm/megaorm-logger)
 
-#### Warnings vs Logs
+### Warnings vs Logs
 
 - **Warnings**: These are stored in memory. If the server restarts, the warnings will be lost.
 - **Logs**: These are stored in a `.log` file, meaning they persist even if the server crashes or restarts.
@@ -391,7 +391,7 @@ console.log(logs); // Outputs an array of logged messages
 
 The **`Getter`** interface provides methods to retrieve various details about the cluster and its pools, including the current mode, warnings, pools, and specific information about the cluster and pools.
 
-#### Methods Overview
+### Methods Overview
 
 - **`mode()`**: Retrieves the current mode of the cluster (`ORDER_MODE` or `RANDOM_MODE`).
 - **`logger()`**: Retrieves the current logger instance.
@@ -402,7 +402,7 @@ The **`Getter`** interface provides methods to retrieve various details about th
 - **`info()`**: Retrieves detailed information about the cluster, including pool statistics and warnings.
 - **`infoAbout(name)`**: Retrieves detailed information about a specific pool by name.
 
-#### Get the Current Mode of the Cluster
+### Get the Current Mode of the Cluster
 
 Use the `mode()` method to get the current select mode for the cluster, which can either be `ORDER_MODE` or `RANDOM_MODE`.
 
@@ -418,7 +418,7 @@ if (cluster.get.mode() === RANDOM_MODE) {
 }
 ```
 
-#### Get the Current Logger Instance
+### Get the Current Logger Instance
 
 The `logger()` method provides access to the current logger instance.
 
@@ -426,7 +426,7 @@ The `logger()` method provides access to the current logger instance.
 console.log(cluster.get.logger());
 ```
 
-#### Get the List of Warnings in the Cluster
+### Get the List of Warnings in the Cluster
 
 You can use the `warnings()` method to retrieve an array of warnings stored in the cluster.
 
@@ -434,7 +434,7 @@ You can use the `warnings()` method to retrieve an array of warnings stored in t
 console.log(cluster.get.warnings());
 ```
 
-#### Get Frozen and Active Pools
+### Get Frozen and Active Pools
 
 You can use `get.pools.frozen()` and `get.pools.active()` to get the list of frozen and active pools in the cluster.
 
@@ -443,7 +443,7 @@ console.log(cluster.get.pools.frozen()); // Frozen pools
 console.log(cluster.get.pools.active()); // Active pools
 ```
 
-#### Get a Pool by Name or Based on the Current Mode
+### Get a Pool by Name or Based on the Current Mode
 
 If you provide a name, the `pool(name)` method will return the pool matching that name. If no name is provided, the pool will be selected based on the current mode (either `ORDER_MODE` or `RANDOM_MODE`).
 
@@ -465,7 +465,7 @@ const randomPool = cluster.get.pool();
 const africanPool = cluster.get.pool('africa*');
 ```
 
-#### Get Full Cluster Information
+### Get Full Cluster Information
 
 You can use the `info()` method to get detailed information about the cluster, including the number of active and frozen pools, warnings, and the cluster's select mode.
 
@@ -473,7 +473,7 @@ You can use the `info()` method to get detailed information about the cluster, i
 console.log(cluster.get.info());
 ```
 
-#### Get Information About a Specific Pool
+### Get Information About a Specific Pool
 
 Use the `infoAbout(name)` method to get detailed information about a specific pool by its name. This includes the pool's ID, creation date, driver, performance, and connection counts.
 
@@ -485,13 +485,13 @@ console.log(cluster.get.infoAbout('asia_1'));
 
 The **`Setter`** interface provides methods to configure various aspects of the cluster, such as setting the pool resolving mode, logger instance, and managing warning messages.
 
-#### Methods Overview
+### Methods Overview
 
 - **`mode(mode)`**: Sets the mode for how pools are selected (`ORDER_MODE` or `RANDOM_MODE`).
 - **`logger(logger)`**: Sets a custom logger instance for the cluster.
 - **`warnings(warnings)`**: Registers or clears warning messages for the cluster.
 
-#### Set the Pool Resolving Mode
+### Set the Pool Resolving Mode
 
 Use the `mode()` method to set the mode for how pools are selected. You can choose between `ORDER_MODE` (sequential order) and `RANDOM_MODE` (random selection).
 
@@ -506,7 +506,7 @@ cluster.set.mode(ORDER_MODE);
 cluster.set.mode(RANDOM_MODE);
 ```
 
-#### Set a Custom Logger Instance
+### Set a Custom Logger Instance
 
 Use the `logger()` method to set a custom logger instance for the cluster. This allows you to log messages to a log file.
 
@@ -523,7 +523,7 @@ cluster.set.logger(logger);
 
 > If the provided logger instance is invalid, an error will be thrown.
 
-#### Register or Clear Warning Messages
+### Register or Clear Warning Messages
 
 You can use the `warnings()` method to register one or more warning messages for the cluster or clear all existing warnings.
 
@@ -544,7 +544,7 @@ cluster.set.warnings([]);
 
 The **`Checker`** interface provides methods to check the presence or state of various cluster properties. It helps you determine if certain resources are available or in a specific state.
 
-#### Methods Overview
+### Methods Overview
 
 - **`logger()`**: Checks if the cluster has a valid logger instance.
 - **`pending()`**: Checks if there are pending connections in the cluster.
@@ -552,7 +552,7 @@ The **`Checker`** interface provides methods to check the presence or state of v
 - **`frozen(name)`**: Checks if a frozen pool exists, optionally by name or pattern.
 - **`active(name)`**: Checks if an active pool exists, optionally by name or pattern.
 
-#### Check if the Logger Exists
+### Check if the Logger Exists
 
 Use the `logger()` method to check if a logger instance is available in the cluster.
 
@@ -561,7 +561,7 @@ if (cluster.has.logger()) console.log('Available');
 else console.log('No logger found');
 ```
 
-#### Check for Pending Connections
+### Check for Pending Connections
 
 The `pending()` method allows you to check if there are any pending connections in the cluster.
 
@@ -570,7 +570,7 @@ if (cluster.has.pending()) console.log('Available');
 else console.log('No pending connections');
 ```
 
-#### Check for Warnings
+### Check for Warnings
 
 Use the `warnings()` method to check if any warnings have been recorded for the cluster.
 
@@ -579,7 +579,7 @@ if (cluster.has.warnings()) console.log('Available');
 else console.log('No warnings');
 ```
 
-#### Check for Frozen and Active Pools
+### Check for Frozen and Active Pools
 
 You can use the `frozen()` and `active()` methods to check for the presence of frozen and active pools, respectively.
 
@@ -591,7 +591,7 @@ if (cluster.has.active()) console.log('Available');
 else console.log('No active pools');
 ```
 
-#### Check for a Specific Frozen or Active Pool
+### Check for a Specific Frozen or Active Pool
 
 You can also check for a frozen or active pool by its name or pattern.
 
